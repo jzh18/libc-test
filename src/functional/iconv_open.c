@@ -13,8 +13,15 @@ int main(void)
 	size_t outlen;
 	size_t r;
 	char *bad = "bad-codeset";
+	rtrace_printf_init();
 
+	rtrace_printf_begin("0x2a700");
+	rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, bad);
+	rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, bad);
 	cd = iconv_open(bad, bad);
+	rtrace_printf(TYPE_RET, TYPE_POINTER, 0, cd);
+	rtrace_printf_end("0x2a700");
+
 	if (cd != (iconv_t)-1)
 		t_error("iconv_open(\"%s\",\"%s\") didn't fail\n", bad, bad);
 	if (errno != EINVAL)

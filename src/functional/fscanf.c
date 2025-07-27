@@ -27,6 +27,7 @@ static FILE *writetemp(const char *data)
 
 int main(void)
 {
+	rtrace_printf_init();
 	int i, x, y;
 	double u;
 	char a[100], b[100];
@@ -43,7 +44,16 @@ int main(void)
 	}
 
 	TEST(i, write(p[1], "hello, world\n", 13), 13, "write error %d!=%d (%s)");
-	TEST(i, fscanf(f, "%s %[own]", a, b), 2, "got %d fields, expected %d");
+	rtrace_printf_begin("0x5fd50");
+	char* sec_input="%s %[own]";
+	int rc;
+	rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, f);
+	rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, sec_input);
+	rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, a);
+	rtrace_printf(TYPE_ARG, TYPE_POINTER, 3, b);
+	TEST(i, (rc=fscanf(f, sec_input, a, b)), 2, "got %d fields, expected %d");
+	rtrace_printf(TYPE_RET, TYPE_POINTER, 0, rc);
+	rtrace_printf_end("0x5fd50");
 	TEST_S(a, "hello,", "wrong result for %s");
 	TEST_S(b, "wo", "wrong result for %[own]");
 	TEST(i, fgetc(f), 'r', "'%c' != '%c') (%s)");

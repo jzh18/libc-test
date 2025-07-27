@@ -8,15 +8,25 @@ int main(int argc, char *argv[])
 	char *s;
 	void (*f)(void);
 	char buf[512];
-
+	rtrace_printf_init();
 	if (!t_pathrel(buf, sizeof buf, argv[0], "dlopen_dso.so")) {
 		t_error("failed to obtain relative path to dlopen_dso.so\n");
 		return 1;
 	}
+	rtrace_printf_begin("0x981f0"); 
+	rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, buf);
+	rtrace_printf(TYPE_ARG, TYPE_INT, 1, RTLD_LAZY|RTLD_LOCAL);
 	h = dlopen(buf, RTLD_LAZY|RTLD_LOCAL);
+	rtrace_printf(TYPE_RET, TYPE_INT, 0, h);
+	rtrace_printf_end("0x981f0");
 	if (!h)
 		t_error("dlopen %s failed: %s\n", buf, dlerror());
+	rtrace_printf_begin("0x982c0"); 
+	rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, h);
+	rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, "i");
 	i = dlsym(h, "i");
+	rtrace_printf(TYPE_RET, TYPE_INT, 0, i);
+	rtrace_printf_end("0x982c0");
 	if (!i)
 		t_error("dlsym i failed: %s\n", dlerror());
 	if (*i != 1)
