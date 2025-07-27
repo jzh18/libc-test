@@ -78,7 +78,7 @@ void rtrace_printf(ExeType exe_arg, ValType type, int index, void *value)
 	switch (type)
 	{
 	case TYPE_INT:
-		fprintf(log_file, "%s-%s-%d-INT: %lu\n", prefix, entry_exit, index, *(int *)value);
+		fprintf(log_file, "%s-%s-%d-INT: %ld\n", prefix, entry_exit, index, value);
 		break;
 	case TYPE_FLOAT:
 		fprintf(log_file, "%s-%s-%d-FLOAT: %f\n", prefix, entry_exit, index, *(float *)value);

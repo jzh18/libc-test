@@ -89,13 +89,29 @@ static void tohex(char *d, void *s, int n)
 
 int main(void)
 {
+	rtrace_printf_init();
 
 // errors
-if (inet_pton(12345, "", 0) != -1 || errno != EAFNOSUPPORT)
+rtrace_printf_begin("0x144560");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, 12345);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, "");
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, 0);
+int rc=inet_pton(12345, "", 0);
+if (rc != -1 || errno != EAFNOSUPPORT)
 	t_error("inet_pton(12345,,) should fail with EAFNOSUPPORT, got %s\n", strerror(errno));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x144560");
+	
 errno=0;
-if (inet_ntop(AF_INET,"xxxx","",0) != 0 || errno != ENOSPC)
+rtrace_printf_begin("0x143900");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, AF_INET);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, "xxxx");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, "");
+rtrace_printf(TYPE_ARG, TYPE_INT, 3, 0);
+if ((rc=inet_ntop(AF_INET,"xxxx","",0)) != 0 || errno != ENOSPC)
 	t_error("inet_ntop(,,0,0) should fail with ENOSPC, got %s\n", strerror(errno));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x143900");
 errno=0;
 
 // dotted-decimal notation

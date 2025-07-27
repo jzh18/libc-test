@@ -11,6 +11,7 @@
 
 int main(void)
 {
+	rtrace_printf_init();
 	struct flock fl = {0};
 	FILE *f;
 	int fd;
@@ -24,7 +25,15 @@ int main(void)
 	fl.l_whence = SEEK_SET;
 	fl.l_start = 0;
 	fl.l_len = 0;
-	TESTE(fcntl(fd, F_SETLK, &fl)==0);
+
+	rtrace_printf_begin("0x116fd0");
+	rtrace_printf(TYPE_ARG, TYPE_INT, 0, fd);
+	rtrace_printf(TYPE_ARG, TYPE_INT, 1, F_SETLK);
+	rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &fl);
+	int rc=0;
+	TESTE((rc=fcntl(fd, F_SETLK, &fl))==0);
+	rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+	rtrace_printf_end("0x116fd0");
 
 	pid = fork();
 	if (!pid) {

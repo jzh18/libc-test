@@ -11,25 +11,43 @@ extern char **environ;
 
 int main()
 {
+	rtrace_printf_init();
 	char *s;
 	int r;
-
+	int rec=0;
 	if (!environ)
 		t_error("environ is NULL\n");
-	if (clearenv() || (environ && *environ))
+	rtrace_printf_begin("0x4aeb0");
+	if (rec=clearenv() || (environ && *environ))
 		t_error("clrearenv: %s\n", strerror(errno));
-	if (putenv("TEST=1"))
+	rtrace_printf(TYPE_RET, TYPE_INT, 0, rec);
+	rtrace_printf_end("0x4aeb0");
+
+	rtrace_printf_begin("0x49310");
+	if (rec=putenv("TEST=1"))
 		t_error("putenv: %s\n", strerror(errno));
+	rtrace_printf(TYPE_RET, TYPE_INT, 0, rec);
+	rtrace_printf_begin("0x49310");
+
 	if (strcmp(environ[0],"TEST=1") != 0)
 		t_error("putenv failed: environ[0]: %s, wanted \"TEST=1\"\n", environ[0]);
 	if ((s=environ[1]))
 		t_error("environ[1]: %p, wanted 0\n", s);
+	
+	rtrace_printf_begin("0x487b0");
 	if (!(s=getenv("TEST")))
 		t_error("getenv(\"TEST\"): 0, wanted \"1\"\n");
+	rtrace_printf(TYPE_RET, TYPE_POINTER, 0, s);
+	rtrace_printf_begin("0x487b0");
+
 	if (strcmp(s,"1") != 0)
 		t_error("getenv(\"TEST\"): \"%s\", wanted \"1\"\n", s);
-	if (unsetenv("TEST"))
+
+	rtrace_printf_begin("0x04ada0");
+	if (rec=unsetenv("TEST"))
 		t_error("unsetenv: %s\n", strerror(errno));
+	rtrace_printf(TYPE_RET, TYPE_INT, 0, rec);
+	rtrace_printf_begin("0x04ada0");
 	if ((s=*environ))
 		t_error("*environ: %p != 0\n", s);
 	if ((s=getenv("TEST")))
