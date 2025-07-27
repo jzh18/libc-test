@@ -8,7 +8,23 @@ extern volatile int t_status;
 #define T_LOC1(l) T_LOC2(l)
 #define t_error(...) t_printf(T_LOC1(__LINE__) ": " __VA_ARGS__)
 
+typedef enum {
+    TYPE_INT,
+    TYPE_FLOAT,
+    TYPE_POINTER,
+} ValType;
+
+typedef enum {
+    TYPE_ARG,
+    TYPE_RET,
+} ExeType;
+
 int t_printf(const char *s, ...);
+
+void rtrace_printf_init();
+void rtrace_printf_begin(const char* func_addr);
+void rtrace_printf(ExeType exe_arg, ValType type, int index, void *value);
+void rtrace_printf_end(const char* func_addr);
 
 int t_vmfill(void **, size_t *, int);
 int t_memfill(void);
