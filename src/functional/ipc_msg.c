@@ -39,8 +39,21 @@ static void snd()
 	T(k = ftok(path, id));
 
 	/* make sure we get a clean message queue id */
+rtrace_printf_begin("0x12c570");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, k);
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, IPC_CREAT|0666);
 	T(qid = msgget(k, IPC_CREAT|0666));
-	T(msgctl(qid, IPC_RMID, 0));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, qid);
+rtrace_printf_end("0x12c570");
+
+rtrace_printf_begin("0x12c5a0");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, qid);
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, IPC_RMID);
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, 0);
+int rc;
+	T((rc=msgctl(qid, IPC_RMID, 0)));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x12c5a0");
 	T(qid = msgget(k, IPC_CREAT|IPC_EXCL|0666));
 
 	if (t_status)
@@ -71,7 +84,13 @@ static void snd()
 		t_error("qid_ds.msg_qbytes > 0 failed: got %d, want > 0\n", qid_ds.msg_qbytes, t);
 
 	/* test send */
-	T(msgsnd(qid, &msg, sizeof msg.data, IPC_NOWAIT));
+rtrace_printf_begin("0x12c420");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, qid);
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, sizeof msg.data);
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, IPC_NOWAIT);
+	T((rc=msgsnd(qid, &msg, sizeof msg.data, IPC_NOWAIT)));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x12c420");
 	T(msgctl(qid, IPC_STAT, &qid_ds));
 	EQ(qid_ds.msg_qnum, 1, "got %d, want %d");
 	EQ(qid_ds.msg_lspid, getpid(), "got %d, want %d");
@@ -99,7 +118,15 @@ static void rcv()
 		t_error("msgrcv should have failed when msgsize==0 with E2BIG, got %s\n", strerror(errno));
 
 	/* test receive */
-	T(msgrcv(qid, &msg, sizeof msg.data, msgtyp, IPC_NOWAIT));
+rtrace_printf_begin("0x12c4c0");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, qid);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, &msg);
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, sizeof msg.data);
+rtrace_printf(TYPE_ARG, TYPE_INT, 3, IPC_NOWAIT);
+int rc;
+	T((rc=msgrcv(qid, &msg, sizeof msg.data, msgtyp, IPC_NOWAIT)));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x12c4c0");
 	if (strcmp(msg.data,"test message") != 0)
 		t_error("received \"%s\" instead of \"%s\"\n", msg.data, "test message");
 
@@ -113,6 +140,7 @@ static void rcv()
 
 int main(void)
 {
+	rtrace_printf_init();
 	int p;
 	int status;
 

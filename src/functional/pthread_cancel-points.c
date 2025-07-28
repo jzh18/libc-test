@@ -124,6 +124,7 @@ static void *run_execute(void *arg)
 
 int main(void)
 {
+	rtrace_printf_init();
 	TESTR(sem_init(&sem_seq, 0, 0), "creating semaphore");
 
 	for (; cur_sc->prepare; cur_sc++) {
@@ -133,10 +134,35 @@ int main(void)
 		cdescr = cur_sc->descr;
 		cur_sc->prepare(cur_sc->arg);
 		seqno = 0;
-		TESTR(pthread_create(&td, 0, run_execute, 0), "creating thread to be canceled");
-		TESTR(pthread_cancel(td), "canceling");
-		TESTR(sem_post(&sem_seq), "unblocking canceled thread");
-		TESTR(pthread_join(td, &res), "joining canceled thread");
+rtrace_printf_begin("0x9cbc0");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &td);
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, 0);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, run_execute);
+rtrace_printf(TYPE_ARG, TYPE_INT, 3, 0);
+int rc;
+		TESTR((rc=pthread_create(&td, 0, run_execute, 0)), "creating thread to be canceled");
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x9cbc0");
+
+rtrace_printf_begin("0x9a8f0");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, td);
+		TESTR((rc=pthread_cancel(td)), "canceling");
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x9a8f0");
+
+rtrace_printf_begin("0xa47e0");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &sem_seq);
+		TESTR((rc=sem_post(&sem_seq)), "unblocking canceled thread");
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0xa47e0");
+
+rtrace_printf_begin("0x9e630");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, td);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, &res);
+		TESTR((rc=pthread_join(td, &res)), "joining canceled thread");
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x9e630");
+
 		if (cur_sc->want_cancel) {
 			TESTC(res == PTHREAD_CANCELED, "canceled thread exit status")
 			&& TESTC(seqno == 1, "seqno");

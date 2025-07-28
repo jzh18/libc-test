@@ -22,6 +22,7 @@
 
 int main(void)
 {
+	rtrace_printf_init();
 	const char *cs;
 	int i;
 	mbstate_t st, st2;
@@ -36,14 +37,31 @@ int main(void)
 	setlocale(LC_CTYPE, "UTF-8") ||
 	setlocale(LC_CTYPE, "") );
 
-	T(mbsrtowcs(wcs, (cs="abcdef",&cs), 3, &st), 3, "wrong semantics for wcs buf len");
+rtrace_printf_begin("0xc9ef0");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, wcs);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, (cs="abcdef",&cs));
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, 3);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 3, &st);
+int rc;
+	T((rc=mbsrtowcs(wcs, (cs="abcdef",&cs), 3, &st)), 3, "wrong semantics for wcs buf len");
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0xc9ef0");
+
 	T(mbsrtowcs(wcs, (cs="abcdef",&cs), 8, &st), 6, "wrong semantics for wcs buf len");
 	T(mbsrtowcs(NULL, (cs="abcdef",&cs), 2, &st), 6, "wrong semantics for NULL wcs");
 
 	if (strcmp(nl_langinfo(CODESET), "UTF-8"))
 		return t_error("cannot set UTF-8 locale for test (codeset=%s)\n", nl_langinfo(CODESET));
 
-	T(mbrtowc(&wc, "\x80", 1, &st), -1, "failed to catch error");
+rtrace_printf_begin("0xc9970");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &wc);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, "\x80");
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, 1);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 3, &st);
+	T((rc=mbrtowc(&wc, "\x80", 1, &st)), -1, "failed to catch error");
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0xc9970");
+
 	T(mbrtowc(&wc, "\xc0", 1, &st), -1, "failed to catch illegal initial");
 
 	T(mbrtowc(&wc, "\xc0\x80", 2, &st), -1, "aliasing nul");
