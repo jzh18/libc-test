@@ -20,13 +20,20 @@ static struct q *new(int i)
 
 int main()
 {
+	rtrace_printf_init();
 	struct q *q = new(0);
 	struct q *p;
 	int i;
 
 	insque(q, 0);
 	for (i = 1; i < 10; i++) {
-		insque(new(i), q);
+
+		struct q *input = new(i);
+rtrace_printf_begin("0x124d60");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, input);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, q);
+		insque(input, q);
+rtrace_printf_end("0x124d60");
 		q = q->n;
 	}
 	p = q;

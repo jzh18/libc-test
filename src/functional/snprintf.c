@@ -142,6 +142,7 @@ static const struct {
 
 int main(void)
 {
+	rtrace_printf_init();
 	int i, j, k;
 	char b[2000];
 
@@ -155,7 +156,17 @@ int main(void)
 	TEST(i, b[5], 'x', "buffer overrun");
 
 	/* Perform ascii arithmetic to test printing tiny doubles */
-	TEST(i, snprintf(b, sizeof b, "%.1022f", 0x1p-1021), 1024, "%d != %d");
+const char* arg2="%.1022f";
+int arg3=0x1p-1021;
+rtrace_printf_begin("0x66370"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, b); 
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, sizeof b); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, arg2); 
+rtrace_printf(TYPE_ARG, TYPE_INT, 3, arg3); 
+int rc;
+	TEST(i, (rc=snprintf(b, sizeof b,arg2 , arg3)), 1024, "%d != %d");
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc); 
+rtrace_printf_end("0x66370"); 
 	b[1] = '0';
 	for (i=0; i<1021; i++) {
 		for (k=0, j=1023; j>0; j--) {

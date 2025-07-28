@@ -18,7 +18,13 @@ static void checkStrptime(const char *s, const char *format, const struct tm *ex
 	struct tm tm = { };
 	const char *ret;
 
+rtrace_printf_begin("0xe3270"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, s); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, format); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, &tm); 
 	ret = strptime(s, format, &tm);
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, ret); 
+rtrace_printf_end("0xe3270"); 
 	if (!ret || *ret != '\0') {
 		t_error("\"%s\": failed to parse \"%s\"\n", format, s);
 	} else if (tm.tm_sec != expected->tm_sec ||
@@ -87,6 +93,7 @@ static struct tm tm4 = {
 };
 
 int main() {
+	rtrace_printf_init();
 	setenv("TZ", "UTC0", 1);
 
 	/* Time */

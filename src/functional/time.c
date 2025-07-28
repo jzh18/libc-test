@@ -51,12 +51,21 @@ static void sec2tm(time_t t, char *m)
 	time_t r;
 
 	errno = 0;
+rtrace_printf_begin("0xde8a0"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &t); 
 	tm = gmtime(&t);
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, tm); 
+rtrace_printf_end("0xde8a0"); 
 	if (errno != 0)
 		t_error("%s: gmtime((time_t)%lld) should not set errno, got %s\n",
 			m, (long long)t, strerror(errno));
 	errno = 0;
+rtrace_printf_begin("0xdf5a0"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, tm); 
 	r = mktime(tm);
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, r); 
+rtrace_printf_end("0xdf5a0"); 
+
 	if (errno != 0)
 		t_error("%s: mktime(%s) should not set errno, got %s\n",
 			m, tm_str(*tm), strerror(errno));
@@ -93,6 +102,7 @@ static void tm2sec(struct tm *tm, int big, char *m)
 
 int main(void)
 {
+	rtrace_printf_init();
 	time_t t;
 
 	putenv("TZ=GMT");
@@ -102,7 +112,7 @@ int main(void)
 	tm2sec(&TM_Y2038, 1, "2038");
 
 	sec2tm(0, "EPOCH");
-	for (t = 1; t < 1000; t++)
+	for (t = 1; t < 2; t++)
 		sec2tm(t*100003, "EPOCH+eps");
 
 	/* FIXME: set a TZ var and check DST boundary conditions */

@@ -29,12 +29,18 @@ static struct {
 
 int main(void)
 {
+	rtrace_printf_init();
 	int i;
 	float x;
 	char *p;
 
 	for (i = 0; i < length(t); i++) {
+rtrace_printf_begin("0x50e40"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, t[i].s); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, &p); 
 		x = strtof(t[i].s, &p);
+rtrace_printf(TYPE_RET, TYPE_INT, 0, (int)x); 
+rtrace_printf_end("0x50e40"); 
 		if (x != t[i].f)
 			t_error("strtof(\"%s\") want %a got %a\n", t[i].s, t[i].f, x);
 	}

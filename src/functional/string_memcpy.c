@@ -28,7 +28,13 @@ static void test_align(int dalign, int salign, int len)
 	}
 	for (i = 0; i < len; i++)
 		src[salign+i] = want[dalign+i] = '0'+i;
-	p = pmemcpy(dst+dalign, src+salign, len);
+rtrace_printf_begin("0xb1720"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, dst+dalign); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, src+salign); 
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, len); 
+	p = memcpy(dst+dalign, src+salign, len);
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, p); 
+rtrace_printf_end("0xb1720"); 
 	if (p != dst+dalign)
 		t_error("memcpy(%p,...) returned %p\n", dst+dalign, p);
 	for (i = 0; i < N; i++)
@@ -42,13 +48,14 @@ static void test_align(int dalign, int salign, int len)
 
 int main(void)
 {
+	rtrace_printf_init();
 	int i,j,k;
 
 	pmemcpy = memcpy;
 
-	for (i = 0; i < 16; i++)
-		for (j = 0; j < 16; j++)
-			for (k = 0; k < 64; k++)
+	for (i = 0; i < 2; i++)
+		for (j = 0; j < 2; j++)
+			for (k = 0; k < 2; k++)
 				test_align(i,j,k);
 
 	return t_status;

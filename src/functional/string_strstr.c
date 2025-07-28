@@ -10,7 +10,12 @@
 
 #define T(s, sub, n) { \
 	char *p = s; \
+rtrace_printf_begin("0xb5ba0"); \
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, p);  \
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, sub);  \
 	char *q = strstr(p, sub); \
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, q); \
+rtrace_printf_end("0xb5ba0"); \
 	if (q == 0) \
 		t_error("strstr(%s,%s) returned 0, wanted str+%d\n", #s, #sub, n); \
 	else if (q - p != n) \
@@ -19,6 +24,7 @@
 
 int main(void)
 {
+	rtrace_printf_init();
 	N("", "a")
 	N("a", "aa")
 	N("a", "b")

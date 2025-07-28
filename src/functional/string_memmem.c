@@ -6,7 +6,14 @@
 
 #define N(s, tail, sub) { \
 	char *p = s tail; \
+rtrace_printf_begin("0xb1cd0"); \
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, p);  \
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, strlen(s));  \
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, sub); \
+rtrace_printf(TYPE_ARG, TYPE_INT, 3, strlen(sub));  \
 	char *q = memmem(p, strlen(s), sub, strlen(sub)); \
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, q); \
+rtrace_printf_end("0xb1cd0"); \
 	if (q) \
 		t_error("memmem("#s" "#tail", %d, "#sub", %d) returned str+%d, wanted 0\n",\
 			strlen(s), strlen(sub), q-p); \
@@ -23,6 +30,7 @@
 
 int main(void)
 {
+	rtrace_printf_init();
 	N("","a", "a")
 	N("a","a", "aa")
 	N("a","b", "b")

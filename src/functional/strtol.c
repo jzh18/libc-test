@@ -20,6 +20,7 @@
 
 int main(void)
 {
+	rtrace_printf_init();
 	int i;
 	long l;
 	unsigned long ul;
@@ -28,9 +29,28 @@ int main(void)
 	char *msg="";
 	char *s, *c;
 
-	TEST(l, atol("2147483647"), 2147483647L, "max 32bit signed %ld != %ld");
-	TEST(l, strtol("2147483647", 0, 0), 2147483647L, "max 32bit signed %ld != %ld");
-	TEST(ul, strtoul("4294967295", 0, 0), 4294967295UL, "max 32bit unsigned %lu != %lu");
+rtrace_printf_begin("0x543f0"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, "2147483647"); 
+long rc;
+	TEST(l, (rc=atol("2147483647")), 2147483647L, "max 32bit signed %ld != %ld");
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, rc); 
+rtrace_printf_end("0x543f0"); 
+	
+rtrace_printf_begin("0x543f0"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, "2147483647"); 
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, 0);
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, 0); 
+	TEST(l, (rc=strtol("2147483647", 0, 0)), 2147483647L, "max 32bit signed %ld != %ld");
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, rc); 
+rtrace_printf_end("0x543f0"); 
+
+rtrace_printf_begin("0x57b60"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, "4294967295"); 
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, 0);
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, 0); 
+	TEST(ul, (rc=strtoul("4294967295", 0, 0)), 4294967295UL, "max 32bit unsigned %lu != %lu");
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc); 
+rtrace_printf_end("0x57b60"); 
 
 	if (sizeof(long) == 4) {
 		TEST(l, strtol(s="2147483648", &c, 0), 2147483647L, "uncaught overflow %ld != %ld");

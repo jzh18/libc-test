@@ -56,6 +56,7 @@ void checkseed(unsigned seed, long *x)
 
 int main()
 {
+	rtrace_printf_init();
 	long x[100];
 	long y,z;
 	int i;
@@ -63,8 +64,13 @@ int main()
 	char *p;
 	char *q;
 
-	for (i = 0; i < 100; i++)
+	for (i = 0; i < 100; i++){
+rtrace_printf_begin("0x4a2b0");
 		x[i] = random();
+rtrace_printf(TYPE_RET, TYPE_INT, 0, x[i]);
+rtrace_printf_end("0x4a2b0");
+	}
+	
 	p = initstate(1, state, sizeof state);
 	for (i = 0; i < 100; i++)
 		if (x[i] != (y = random()))
@@ -76,7 +82,10 @@ int main()
 			t_error("setstate failed (%d) orig: %ld, reset: %ld\n", i, z, y);
 		p = setstate(q);
 	}
+	rtrace_printf_begin("0x4a340");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, 1);
 	srandom(1);
+rtrace_printf_end("0x4a340");
 	for (i = 0; i < 100; i++)
 		if (x[i] != (y = random()))
 			t_error("srandom(1) is not default: (%d) default: %ld, seed1: %ld\n", i, x[i], y);
