@@ -10,7 +10,16 @@ static char tab[100][W];
 static size_t nel;
 
 #define set(k) do{ \
-	char *r = lsearch(k, tab, &nel, W, (int(*)(const void*,const void*))strcmp); \
+int* ptr= (int(*)(const void*,const void*))strcmp;\
+rtrace_printf_begin("0x124ef0"); \
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, k); \
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, tab); \
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, &nel); \
+rtrace_printf(TYPE_ARG, TYPE_INT, 3, W); \
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 4, ptr); \
+	char *r = lsearch(k, tab, &nel, W, ptr); \
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, r); \
+rtrace_printf_end("0x124ef0"); \
 	if (strcmp(r, k) != 0) \
 		t_error("lsearch %s failed\n", #k); \
 }while(0)
@@ -19,6 +28,7 @@ static size_t nel;
 
 int main()
 {
+	rtrace_printf_init();
 	size_t n;
 
 	set("");

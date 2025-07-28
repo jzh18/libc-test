@@ -58,7 +58,14 @@ static void getparent(const void *node, VISIT v, int d)
 
 struct e *get(char *k)
 {
-	void **p = tfind(&(struct e){.k = k}, &root, cmp);
+	struct e arg1=(struct e){.k = k};
+	rtrace_printf_begin("0x1287a0"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &arg1); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, &root); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, cmp); 
+	void **p = tfind(&arg1, &root, cmp);
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, p); 
+rtrace_printf_end("0x1287a0"); 
 	if (!p) return 0;
 	return *p;
 }
@@ -70,7 +77,15 @@ struct e *set(char *k, int v)
 	cur->v = v;
 	if (!get(k))
 		count++;
-	p = tsearch(cur++, &root, cmp);
+	struct e*  arg1=cur;
+rtrace_printf_begin("0x1283d0"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, arg1); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, &root); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, cmp); 
+	p = tsearch(arg1, &root, cmp);
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, p); 
+rtrace_printf_end("0x1283d0"); 
+cur++;
 	if (!p || strcmp(((struct e*)*p)->k, k) != 0)
 		t_error("tsearch %s %d failed\n", k, v);
 	if (!p) {
@@ -82,13 +97,21 @@ struct e *set(char *k, int v)
 
 void *del(char *k)
 {
-	void *p = tdelete(&(struct e){.k = k}, &root, cmp);
+	struct e arg1=(struct e){.k = k};
+	rtrace_printf_begin("0x128820"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &arg1); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, &root); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, cmp); 
+	void *p = tdelete(&arg1, &root, cmp);
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, p); 
+rtrace_printf_end("0x128820"); 
 	if (p)
 		count--;
 	return p;
 }
 
 int main() {
+	rtrace_printf_init();
 	struct e *e;
 	void *p;
 

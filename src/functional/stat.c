@@ -11,11 +11,16 @@
 
 int main(void)
 {
+	rtrace_printf_init();
 	struct stat st;
 	FILE *f;
 	time_t t;
 
-	if (TEST(stat(".",&st)==0, "errno = %s\n", strerror(errno))) {
+rtrace_printf_begin("0x11bbc0"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, "."); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, &st); 
+int rc;
+	if (TEST((rc=stat(".",&st))==0, "errno = %s\n", strerror(errno))) {
 		TEST(S_ISDIR(st.st_mode), "\n");
 		TEST(st.st_nlink>0, "%ju\n", (uintmax_t)st.st_nlink);
 		t = time(0);
@@ -23,6 +28,8 @@ int main(void)
 		TEST(st.st_mtime<=t, "%jd > %jd\n", (intmax_t)st.st_mtime, (intmax_t)t);
 		TEST(st.st_atime<=t, "%jd > %jd\n", (intmax_t)st.st_atime, (intmax_t)t);
 	}
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc); 
+rtrace_printf_end("0x11bbc0"); 
 
 	if (TEST(stat("/dev/null",&st)==0, "errno = %s\n", strerror(errno))) {
 		TEST(S_ISCHR(st.st_mode), "\n");

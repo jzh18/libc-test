@@ -8,7 +8,15 @@ static char buffer[100];
 
 static void checkStrftime(const char* format, const struct tm* tm,
 		const char* expected) {
+
+rtrace_printf_begin("0xe9f60"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, buffer); 
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, sizeof(buffer)); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, format); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 3, tm); 
 	size_t resultLength = strftime(buffer, sizeof(buffer), format, tm);
+rtrace_printf(TYPE_RET, TYPE_INT, 0, resultLength); 
+rtrace_printf_end("0xe9f60"); 
 
 	if (resultLength != 0 && strcmp(buffer, expected) != 0) {
 		t_error("\"%s\": expected \"%s\", got \"%s\"\n", format, expected, buffer);
@@ -78,6 +86,7 @@ static struct tm tm5 = {
 };
 
 int main() {
+	rtrace_printf_init();
 	setenv("TZ", "UTC0", 1);
 
 	checkStrftime("%c", &tm1, "Sun Jan  3 13:23:45 2016");

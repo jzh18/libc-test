@@ -103,7 +103,13 @@ static void uint64_gen(uint64_t *p, uint64_t *p_sorted, int n)
 static void uint64_test(uint64_t *a, uint64_t *a_sorted, int len)
 {
 	int i;
+rtrace_printf_begin("0x49b70");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, a);
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, len);
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, sizeof *a);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, cmp64);
 	qsort(a, len, sizeof *a, cmp64);
+rtrace_printf_end("0x49b70");
 	for (i=0; i<len; i++) {
 		if (a[i] != a_sorted[i]) {
 			t_error("uint64 sort failed at index %d\n", i);
@@ -158,6 +164,7 @@ static void char_test(void)
 
 int main(void)
 {
+	rtrace_printf_init();
 	int i;
 
 	str_test(s, s_sorted, sizeof s/sizeof*s);

@@ -15,6 +15,7 @@
 
 int main(void)
 {
+	rtrace_printf_init();
 	int i;
 	char a[100];
 	FILE *f;
@@ -29,7 +30,14 @@ int main(void)
 	TEST(i, feof(f), 0, "%d != %d");
 	TEST(i, fgetc(f), 'h', "'%c' != '%c'");
 	TEST(i, ftell(f), 1, "%d != %d");
-	TEST(i, ungetc('x', f), 'x', "%d != %d");
+rtrace_printf_begin("0x887d0"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, 'x'); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, f); 
+int rc;
+	TEST(i, (rc=ungetc('x', f)), 'x', "%d != %d");
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc); 
+rtrace_printf_end("0x887d0"); 
+
 	TEST(i, ftell(f), 0, "%d != %d");
 	TEST(i, fscanf(f, "%[h]", a), 0, "got %d fields, expected %d");
 	TEST(i, ftell(f), 0, "%d != %d");

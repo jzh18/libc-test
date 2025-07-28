@@ -17,7 +17,12 @@ static void *aligncpy(void *p, size_t len, size_t a)
 	int align; \
 	for (align=0; align<8; align++) { \
 		char *p = aligncpy(s, sizeof s, align); \
+rtrace_printf_begin("0xb3090"); \
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, p);  \
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, c);  \
 		char *q = strchr(p, c); \
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, q); \
+rtrace_printf_end("0xb3090"); \
 		if (q) \
 			t_error("strchr(%s,%s) with align=%d returned str+%d, wanted 0\n", #s, #c, align, q-p); \
 	} \
@@ -37,6 +42,7 @@ static void *aligncpy(void *p, size_t len, size_t a)
 
 int main(void)
 {
+	rtrace_printf_init();
 	int i;
 	char a[128];
 	char s[256];

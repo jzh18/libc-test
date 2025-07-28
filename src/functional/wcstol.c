@@ -20,8 +20,15 @@ int main(void)
 	unsigned long ul;
 	char *msg="";
 	wchar_t *s, *c;
-
-	TEST(l, wcstol(L"2147483647", 0, 0), 2147483647L, "max 32bit signed %ld != %ld");
+rtrace_printf_init();
+rtrace_printf_begin("0xd2db0");  
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, L"2147483647"); 
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, 0); 
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, 0); 
+long rc;
+	TEST(l, (rc=wcstol(L"2147483647", 0, 0)), 2147483647L, "max 32bit signed %ld != %ld");
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, rc); 
+rtrace_printf_end("0xd2db0");  
 	TEST(ul, wcstoul(L"4294967295", 0, 0), 4294967295UL, "max 32bit unsigned %lu != %lu");
 
 	if (sizeof(long) == 4) {

@@ -8,6 +8,7 @@
 #include <errno.h>
 #include "test.h"
 
+// do not trace hsearch as it calls underlying hsearc_r
 #define set(k,v) do{ \
 	e = hsearch((ENTRY){.key = k, .data = (void*)v}, ENTER); \
 	if (!e || strcmp(e->key, k) != 0) \
@@ -20,10 +21,16 @@
 
 int main()
 {
+	rtrace_printf_init();
 	ENTRY *e;
 
-	if (hcreate(-1) || errno != ENOMEM)
+rtrace_printf_begin("0x1208f0");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, -1);
+int rc;
+	if (rc=hcreate(-1) || errno != ENOMEM)
 		t_error("hcreate((size_t)-1) should fail with ENOMEM got %s\n", strerror(errno));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x1208f0");
 	if (!hcreate(13))
 		t_error("hcreate(13) failed\n");
 	set("", 0);
@@ -49,6 +56,8 @@ int main()
 	set("j", 10);
 	if (e && getdata(e) != 10)
 		t_error("hsearch ENTER j 10 returned data %d, wanted 10\n", getdata(e));
+rtrace_printf_begin("0x1208e0");
 	hdestroy();
+rtrace_printf_end("0x1208e0");
 	return t_status;
 }

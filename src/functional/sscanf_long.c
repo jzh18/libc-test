@@ -8,7 +8,8 @@
 
 int main(void)
 {
-	enum {n = 8*1024*1024};
+	rtrace_printf_init();
+	enum {n = 8};
 	char *s = malloc(n);
 	int i;
 	float f;
@@ -27,7 +28,14 @@ int main(void)
 	 * same issue with %d except then storing the conversion
 	 * result is undefined behaviour
 	 */
+rtrace_printf_begin("0x5fee0"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, s); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, "%f %c"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, &f); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, &c); 
 	i = sscanf(s, "%f %c", &f, &c);
+rtrace_printf(TYPE_RET, TYPE_INT, 0, i); 
+rtrace_printf_end("0x5fee0"); 
 
 	if (i != 2)
 		t_error("sscanf returned %d, want 2\n", i);

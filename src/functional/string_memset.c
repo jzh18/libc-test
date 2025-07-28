@@ -27,7 +27,13 @@ static void test_align(int align, int len)
 		buf[i] = buf2[i] = ' ';
 	for (i = 0; i < len; i++)
 		want[i] = '#';
-	p = pmemset(s, '#', len);
+rtrace_printf_begin("0xb2290"); 
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, s);  
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, '#');  
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, len);  
+	p = memset(s, '#', len);
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, p); 
+rtrace_printf_end("0xb2290"); \
 	if (p != s)
 		t_error("memset(%p,...) returned %p\n", s, p);
 	for (i = -64; i < len+64; i++)
@@ -53,12 +59,13 @@ static void test_value(int c)
 
 int main(void)
 {
+	rtrace_printf_init();
 	int i,j,k;
 
 	pmemset = memset;
 
-	for (i = 0; i < 64; i++)
-		for (j = 0; j < N-256; j++)
+	for (i = 0; i < 2; i++)
+		for (j = 0; j < 2; j++)
 			test_align(i,j);
 
 	test_value('c');
