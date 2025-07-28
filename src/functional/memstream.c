@@ -22,6 +22,7 @@
 
 int main(void)
 {
+	rtrace_printf_init();
 	FILE *f;
 	char *s;
 	size_t l;
@@ -29,7 +30,13 @@ int main(void)
 	int i;
 
 	s = 0;
+rtrace_printf_begin("0x8f2b0");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &s);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, &l);
 	TEST_E(f = open_memstream(&s, &l));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, f);
+rtrace_printf_end("0x8f2b0");
+
 	TEST_E(putc('a', f) == 'a');
 	TEST_E(putc('b', f) == 'b');
 	TEST_E(putc('c', f) == 'c');
@@ -54,7 +61,14 @@ int main(void)
 	fclose(f);
 	free(s);
 
+rtrace_printf_begin("0x90cb0");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, buf);
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, 10);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 2, "r+");
 	TEST_E(f = fmemopen(buf, 10, "r+"));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, f);
+rtrace_printf_end("0x90cb0");
+
 	TEST_E(fputs("hello", f) >= 0);
 	TEST_E(fputc(0, f)==0);
 	TEST_E(fseek(f, 0, SEEK_SET)>=0);

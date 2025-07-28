@@ -36,8 +36,24 @@ static void set()
 	T(k = ftok(path, id));
 
 	/* make sure we get a clean shared memory id */
+rtrace_printf_begin("0x12c770");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, k);
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, 100);
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, IPC_CREAT|0666);
 	T(shmid = shmget(k, 100, IPC_CREAT|0666));
-	T(shmctl(shmid, IPC_RMID, 0));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, shmid);
+rtrace_printf_end("0x12c770");
+
+
+rtrace_printf_begin("0x12c7b0");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, shmid);
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, IPC_RMID);
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, 0);
+int rc;
+	T((rc=shmctl(shmid, IPC_RMID, 0)));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x12c7b0");
+
 	T(shmid = shmget(k, 100, IPC_CREAT|IPC_EXCL|0666));
 
 	if (t_status)
@@ -67,8 +83,14 @@ static void set()
 		t_error("shmid_ds.shm_ctime <= t+5 failed: got %lld, want <= %lld\n", (long long)shmid_ds.shm_ctime, (long long)t+5);
 
 	/* test attach */
+rtrace_printf_begin("0x12c710");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, shmid);
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, 0);
+rtrace_printf(TYPE_ARG, TYPE_INT, 2, 0);
 	if ((p=shmat(shmid, 0, 0)) == 0)
 		t_error("shmat failed: %s\n", strerror(errno));
+rtrace_printf(TYPE_RET, TYPE_POINTER, 0, p);
+rtrace_printf_end("0x12c710");
 	T(shmctl(shmid, IPC_STAT, &shmid_ds));
 	EQ((int)shmid_ds.shm_nattch, 1, "got %d, want %d");
 	EQ(shmid_ds.shm_lpid, getpid(), "got %d, want %d");
@@ -77,7 +99,11 @@ static void set()
 	if (shmid_ds.shm_atime > t+5)
 		t_error("shm_atime is %lld want <= %lld\n", (long long)shmid_ds.shm_atime, (long long)t+5);
 	strcpy(p, "test data");
-	T(shmdt(p));
+rtrace_printf_begin("0x12c740");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, p);
+	T((rc=shmdt(p)));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0x12c740");
 }
 
 static void get()
@@ -103,6 +129,7 @@ static void get()
 
 int main(void)
 {
+	rtrace_printf_init();
 	int p;
 	int status;
 

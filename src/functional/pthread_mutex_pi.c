@@ -82,9 +82,27 @@ static int test_unlock(int mtype)
 	void *p;
 	void *a[] = {&m,&i};
 
-	T(pthread_mutexattr_init(&ma));
-	T(pthread_mutexattr_settype(&ma, mtype));
-	T(pthread_mutexattr_setprotocol(&ma, PTHREAD_PRIO_INHERIT));
+rtrace_printf_begin("0xa1c70");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &ma);
+int rc;
+	T((rc=pthread_mutexattr_init(&ma)));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0xa1c70");
+
+rtrace_printf_begin("0xa1db0");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &ma);
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 1, mtype);
+	T((rc=pthread_mutexattr_settype(&ma, mtype)));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0xa1db0");
+
+rtrace_printf_begin("0xa1d00");
+rtrace_printf(TYPE_ARG, TYPE_POINTER, 0, &ma);
+rtrace_printf(TYPE_ARG, TYPE_INT, 1, PTHREAD_PRIO_INHERIT);
+	T((rc=pthread_mutexattr_setprotocol(&ma, PTHREAD_PRIO_INHERIT)));
+rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
+rtrace_printf_end("0xa1d00");
+
 	T(pthread_mutex_init(a[0], &ma));
 	T(pthread_mutexattr_destroy(&ma));
 	T(pthread_create(&t, 0, unlock, a));
@@ -136,6 +154,7 @@ static void test_mutexattr()
 
 int main(void)
 {
+	rtrace_printf_init();
 	int i;
 
 	test_mutexattr();
