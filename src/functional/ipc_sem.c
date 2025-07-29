@@ -102,14 +102,14 @@ rtrace_printf_end("0x12c5e0");
 	sops.sem_num = 0;
 	sops.sem_op = -1;
 	sops.sem_flg = 0;
-rtrace_printf_begin("0x12c5d0");
+rtrace_printf_begin("0x12c6d0");
 rtrace_printf(TYPE_ARG, TYPE_INT, 0, semid);
 rtrace_printf(TYPE_ARG, TYPE_INT, 1, &sops);
 rtrace_printf(TYPE_ARG, TYPE_INT, 2, 1);
 int rc;
 	T((rc=semop(semid, &sops, 1)));
 rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
-rtrace_printf_end("0x12c5d0");
+rtrace_printf_end("0x12c6d0");
 
 rtrace_printf_begin("0x12c610");
 rtrace_printf(TYPE_ARG, TYPE_INT, 0, semid);
