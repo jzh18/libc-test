@@ -40,12 +40,12 @@ rtrace_printf_end("0x878b0");
 	if (f) {
 		TEST_E(fgets(foo, sizeof foo, f));
 		TEST_S(foo, "hello", "child process did not say hello");
-rtrace_printf_begin("0x8f460");
-rtrace_printf(TYPE_ARG, TYPE_INT, 0, 0);
+rtrace_printf_begin("0x85290");
+rtrace_printf(TYPE_ARG, TYPE_INT, 0, f);
 int rc;
 		TEST(i, (rc=pclose(f)), 0, "exit status %04x != %04x");
 rtrace_printf(TYPE_RET, TYPE_INT, 0, rc);
-rtrace_printf_end("0x8f460");
+rtrace_printf_end("0x85290");
 	}
 
 	signal(SIGUSR1, handler);
